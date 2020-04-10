@@ -21,5 +21,51 @@ namespace logger
 		int line_number = 0;
 	};
 
+	/**
+	* @brief  Interface for formatting the given data.
+	*/
+	class IFormatter
+	{
+	public:
+		/**
+		* @brief Sets format pattern.
+		* @param pattern formatting pattern 
+		* @retval std::string
+		*/
+		void set_format_pattern(std::string pattern);
+
+		/**
+		* @brief Returns formatting pattern.
+		* @param None
+		* @retval std::string
+		*/
+		std::string get_format_pattern() const;
+
+		/**
+		* @brief Formats the given data.
+		* @param msg log message
+		* @param level log level
+		* @param logger_name default name is root
+		* @param log_credentials extracted log credentials 
+		* @retval std::string
+		*/
+		template<typename T>
+		virtual std::string  format(T msg, logger::LEVEL level, std::string& logger_name, std::shared_ptr<logger::IExtarctedLogCredentials>& log_credentials) = 0;
+
+	private:
+		std::string format_pattern;
+	};
+
+	//Implemtation of methods of class IFormatter.
+	void IFormatter::set_format_pattern(std::string pattern)
+	{
+		this->format_pattern = pattern;
+	}
+
+	std::string IFormatter::get_format_pattern() const
+	{
+		return format_pattern;
+	}
+
 };
 #endif()
