@@ -90,6 +90,21 @@ namespace logger
 	};
 
 
+	/**
+	* @brief  Interface for checking severity level.
+	*/
+	class ICheckSeverityLevel
+	{
+	public:
+		/**
+		* @brief Checks the severity level against  the preferred severity level.
+		* @params preferred_severity_level 
+		* @params test_severity_level 
+		* @retval bool
+		*/
+		virtual bool check_severity_level(logger::LEVEL preferred_severity_level, logger::LEVEL test_severity_level) = 0;
+	};
+
 	//Implemtation of methods of class IFormatter.
 	void IFormatter::set_format_pattern(std::string pattern)
 	{
