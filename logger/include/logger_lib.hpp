@@ -105,6 +105,38 @@ namespace logger
 		virtual bool check_severity_level(logger::LEVEL preferred_severity_level, logger::LEVEL test_severity_level) = 0;
 	};
 
+	/**
+	* @brief  Interface for recording the formatted data to the sink following the severity criterion.
+	*/
+	template<typename T>
+	class IRecorder
+	{
+	public:
+		/**
+		* @brief  Ctor.
+		* @params i_check Used for  checking severity criterion.
+		* @params i_formatter Used for  formatting  data.
+		* @params i_sink Used for writing/dumping options may be to a file etc.
+		* @retval std::string
+		*/
+		IRecorder(std::shared_ptr<logger::ICheckSeverityLevel>& i_check, std::shared_ptr<logger::IFormatter>& i_formatter, std::shared_ptr<logger::ISink>& i_sink);
+	
+		/**
+		* @brief  Records the data to a particular sink .
+		* @params msg log message
+		* @params level log level
+		* @params logger_name  logger name
+		* @params extracted_data log credentials
+		* @retval bool
+		*/
+		virtual bool record(T& msg, logger::LEVEL& level, std::string& logger_name, std::shared_ptr<logger::IExtarctedLogCredentials>& extracted_data) = 0;
+	
+	private:
+		std::shared_ptr<logger::IFormatter> i_formatter;
+		std::shared_ptr<logger::ISink> i_sink;
+		std::shared_ptr<logger::ICheckSeverityLevel> i_check;
+	};
+
 	//Implemtation of methods of class IFormatter.
 	void IFormatter::set_format_pattern(std::string pattern)
 	{
@@ -124,6 +156,13 @@ namespace logger
 	std::string ISink::get_sink() const
 	{
 		return sink;
+	}
+
+	//Implementation  of methods of class IRecorder.
+	template<typename T>
+	IRecorder<T>::IRecorder<T>(std::shared_ptr<logger::ICheckSeverityLevel>& i_check, std::shared_ptr<logger::IFormatter>& i_formatter, std::shared_ptr<logger::ISink>& i_sink) :
+		i_check(i_check), i_formatter(i_formatter), i_sink(i_sink)
+	{
 	}
 };
 #endif()
