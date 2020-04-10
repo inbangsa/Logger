@@ -56,6 +56,40 @@ namespace logger
 		std::string format_pattern;
 	};
 
+
+	/**
+	* @brief  Interface for defining where the log has to be written/dumped to eg. file, datebase, webserver etc.  
+	*/
+	class ISink
+	{
+	public:
+
+		/**
+		* @brief  Sets the sink option.
+		* @params sink data writing option
+		* @retval None
+		*/
+		void set_sink(std::string sink);
+
+		/**
+		* @brief  Returns the sink option.
+		* @params None
+		* @retval std::string
+		*/
+		std::string get_sink() const;
+
+		/**
+		* @brief  User defined sink option.
+		* @params sink data writing option
+		* @retval std::string
+		*/
+		virtual std::string sink(std::string sink) = 0;
+
+	private:
+		std::string sink;
+	};
+
+
 	//Implemtation of methods of class IFormatter.
 	void IFormatter::set_format_pattern(std::string pattern)
 	{
@@ -67,5 +101,14 @@ namespace logger
 		return format_pattern;
 	}
 
+	//Implementation methods of class ISink .
+	void ISink::set_sink(std::string sink)
+	{
+		this->sink = sink;
+	}
+	std::string ISink::get_sink() const
+	{
+		return sink;
+	}
 };
 #endif()
