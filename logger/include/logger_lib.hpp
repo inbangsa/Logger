@@ -2,7 +2,6 @@
 #define LOGGER_LIB_HPP
 
 #include <string>
-#include <memory>
 
 namespace logger
 {
@@ -22,4 +21,5 @@ namespace logger
 	};
 
 };
+
 #endif()
