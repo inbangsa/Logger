@@ -3,6 +3,7 @@
 
 namespace logger
 {
+	
 };
 
 #endif()

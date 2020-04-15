@@ -1,3 +1,7 @@
+# Reference :
+# Author : Jason Turner
+# Repository : https://github.com/lefticus/cpp_starter_project/blob/master/cmake/StandardProjectSettings.cmake 
+
 # Specify the C++ standard.
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
@@ -41,4 +45,3 @@ if(ENABLE_IPO)
     message(SEND_ERROR "IPO is not supported: ${output}")
   endif()
 endif()
-
