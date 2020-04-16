@@ -1,9 +1,9 @@
 #ifndef LOGGER_LIB_HPP
 #define LOGGER_LIB_HPP
 
-namespace logger
-{
-	
-};
+#include "formatter.hpp"
 
+namespace logger {
+
+};// namespace logger
 #endif()
