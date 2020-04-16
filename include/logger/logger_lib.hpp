@@ -2,6 +2,7 @@
 #define LOGGER_LIB_HPP
 
 #include "formatter.hpp"
+#include "compare_levels.hpp"
 
 namespace logger {
 
