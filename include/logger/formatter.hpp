@@ -11,18 +11,18 @@ class IFormatter
 {
 public:
   /**
-   * @brief Sets format pattern.
-   * @param pattern formatting pattern
+   * @brief Sets format pattern according to which formatting will be done.
+   * @param format_pattern pattern that will be used to format  the data
    * @retval std::string
    */
-  void i_set_format_pattern(std::string format_pattern);
+  void SetFormatPattern(std::string format_pattern);
 
   /**
    * @brief Returns formatting pattern.
    * @param None
    * @retval std::string
    */
-  std::string i_get_format_pattern() const;
+  std::string GetFormatPattern() const;
 
    /**
    * @brief Interface for accessing format function.
@@ -32,7 +32,7 @@ public:
    * @param log_credentials extracted log credentials
    * @retval std::string
    */
-  std::string i_format_data(std::string msg,
+  std::string FormatData(std::string msg,
     logger::LEVEL level,
     std::string &logger_name,
     std::shared_ptr<logger::ExtractedLogCredentials> &log_credentials);
@@ -51,15 +51,17 @@ private:
     std::string &logger_name,
     std::shared_ptr<logger::ExtractedLogCredentials> &log_credentials) = 0;
 
-private:
+  /**
+   * @brief User can set the format pattern depending upon which the data will be formatted.
+ */
   std::string format_pattern;
 };
 
-void logger::IFormatter::i_set_format_pattern(std::string format_pattern) { this->format_pattern = format_pattern; }
+void logger::IFormatter::SetFormatPattern(std::string format_pattern) { this->format_pattern = format_pattern; }
 
-std::string logger::IFormatter::i_get_format_pattern() const { return format_pattern; }
+std::string logger::IFormatter::GetFormatPattern() const { return format_pattern; }
 
-std::string logger::IFormatter::i_format_data(std::string msg,
+std::string logger::IFormatter::FormatData(std::string msg,
   logger::LEVEL level,
   std::string &logger_name,
   std::shared_ptr<logger::ExtractedLogCredentials> &log_credentials)
