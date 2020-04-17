@@ -4,12 +4,15 @@
 #include "formatter.hpp"
 
 namespace logger {
+/**
+ * @brief Interface for writing the formatted data/log details to a sink such as file, database, webserver etc.
+ */
 class ISink
 {
 public:
   /**
-   * @brief Assigns the pointer to the formatter.
-   * @param formatter_ptr to format the data.
+   * @brief Ctor that assigns the pointer to the formatter class.
+   * @param formatter_ptr used to format the data
    * @retval None
    */
   ISink(std::shared_ptr<logger::IFormatter> &formatter_ptr);
@@ -22,7 +25,7 @@ public:
    * @param log_credentials extracted log credentials
    * @retval bool
    */
-  bool i_record(std::string msg,
+  bool Record(std::string msg,
     logger::LEVEL level,
     std::string &logger_name,
     std::shared_ptr<logger::ExtractedLogCredentials> &log_credentials);
@@ -32,7 +35,7 @@ public:
    * @param None
    * @retval std::shared_ptr<logger::IFormatter>
    */
-  std::shared_ptr<logger::IFormatter> i_get_formatter_ptr();
+  std::shared_ptr<logger::IFormatter> GetFormatterPtr();
 
 private:
   /**
@@ -56,7 +59,7 @@ private:
 
 ISink::ISink(std::shared_ptr<logger::IFormatter> &formatter_ptr) : formatter_ptr(formatter_ptr) {}
 
-bool logger::ISink::i_record(std::string msg,
+bool logger::ISink::Record(std::string msg,
   logger::LEVEL level,
   std::string &logger_name,
   std::shared_ptr<logger::ExtractedLogCredentials> &log_credentials)
@@ -64,7 +67,7 @@ bool logger::ISink::i_record(std::string msg,
   return this->record(msg, level, logger_name, log_credentials);
 }
 
-std::shared_ptr<logger::IFormatter> logger::ISink::i_get_formatter_ptr() { return this->formatter_ptr; }
+std::shared_ptr<logger::IFormatter> logger::ISink::GetFormatterPtr() { return this->formatter_ptr; }
 
 };// namespace logger
 
