@@ -16,6 +16,8 @@ enum class LEVEL : int { OFF = 0, FATAL = 1, ERROR = 2, WARN = 3, DEBUG = 4, TRA
  */
 struct ExtractedLogCredentials
 {
+  std::string date = "";
+  std::string time = "";
   std::string file_name = "";
   std::string function_name = "";
   int line_number = 0;
