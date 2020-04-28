@@ -78,5 +78,15 @@ bool ExtractedLogCredentials::IsCheckValidLogCredentials() const
   return !(date.empty() || time.empty() || function_name.empty() || file_name.empty() || line_number==0);
 }
 };// namespace internal
+/**
+ * @brief  Data Structure to user specified log related details.
+ */
+struct LogSettings
+{
+ logger::LEVEL desired_level=logger::LEVEL::TRACE;
+ std::string logger_name="default logger";
+
+};
+
 };// namespace logger
 #endif()

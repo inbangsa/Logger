@@ -1,21 +1,16 @@
 #ifndef SINK_HPP
 #define SINK_HPP
 
+#include <iostream>
+#include <fstream >
 #include "formatter.hpp"
 #include <fstream>
 #include <exception>
 
-namespace logger {
-/**
- * @brief Interface for writing the formatted data/log details to a sink such as file, database, webserver etc.
- */
-class ISink
+namespace logger
 {
-public:
   /**
-   * @brief Ctor that assigns the pointer to the formatter class.
-   * @param formatter_ptr used to format the data
-   * @retval None
+   * @brief Interface for writing the formatted data/log details to a sink such as file, database, webserver etc.
    */
   ISink(std::shared_ptr<logger::IFormatter> formatter_ptr);
 
