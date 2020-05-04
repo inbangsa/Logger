@@ -1,6 +1,5 @@
 #ifndef LOGGER_LIB_HPP
 #define LOGGER_LIB_HPP
-
 #include "err.hpp"
 #include "sink.hpp"
 #include <vector>
@@ -65,64 +64,64 @@
  *@param logger_name logger name
  */
 #define SET_LOGGER_NAME(logger_name) logger::set_logger_name(logger_name)
-
 namespace logger {
-
-/*
- *@brief To store logger name and desired severity level.
- */
-auto log_settings = std::make_shared<logger::LogSettings>();
-
-/*
- *@brief To record the data to assiged sink.
- */
-std::shared_ptr<logger::ISink> sink_ptr = std::make_shared<logger::DefaultSink>();
-
 /*
  *@brief Sets the log severity level.
- *@param level   desired log severity level
+ *@param level  desired log severity level
+ *@retval None
  */
 void set_severity_level(logger::LEVEL level);
 
 /*
  *@brief Sets the user defined sink.
- *@param any_sink_ptr
+ *@param any_sink_ptr user defined sink
+ *@retval None
  */
 void set_sink(std::shared_ptr<ISink> any_sink_ptr);
 
 /*
  *@brief Sets the logger name.
  *@param logger_name desired logger name
+ *@retval None
  */
 void set_logger_name(std::string logger_name);
 
 /*
- *@brief Method to check the if parameters passed are not empty.
- *@param logger_name desired logger name
+ *@brief Method to check the if parameters passed are not empty or non zero.
+ *@param date  date at which message is logged
+ *@param time  time at which message is logged
+ *@param line_number line_number from where message is logged
+ *@param file_name file name from where message is logged
+ *@param function_name  function name from where message is logged
  *@retval bool
  */
-bool check_empty(std::string message, std::string date, std::string time, std::string file, std::string function);
+bool check_empty_log_credentials(std::string date,
+  std::string time,
+  int line_number,
+  std::string file,
+  std::string function);
 
 /**
  * @brief To log message at a given level with extracted parameters such as date, time etc.
  * @param level log level
+ *@param message message
  * @param date date at which message is logged
  * @param time time at which message is logged
- * @param line  line number from where message is logged
- * @param file  file name from where message is logged
- * @param function function function name from where message is logged
+ * @param line_number  line number from where message is logged
+ * @param file_name  file name from where message is logged
+ * @param function_name function name from where message is logged
  * @retval bool
  */
 void log(logger::LEVEL level,
   std::string message,
   std::string date,
   std::string time,
-  int line,
-  std::string file,
-  std::string function);
+  int line_number,
+  std::string file_name,
+  std::string function_name);
 
 /*
- *@brief Logs the message at given level with no extacted data such as time , date etc.
+ *@brief Logs the message at given level .
  */
 class Logger
 {
@@ -149,7 +148,7 @@ public:
   /*
    *@brief Method to log message to TRACE level directly.
    *@param message log message
-   *@retval  void
+   *@retval void
    */
   void Trace(std::string message);
 
@@ -195,13 +194,50 @@ public:
    */
   void SetLogLevel(logger::LEVEL level);
 
+  /*
+   *@brief Method set logger name.
+   *@param logger_name logger name
+   *@retval void
+   */
+  void SetLoggerName(std::string logger_name);
+
+  /*
+   *@brief Method to set the log credentails , to be used if  message is to be logged along with extracted data
+   *available such as time, date etc.
+   *@param date  date at which message is logged
+   *@param time  time at which message is logged
+   *@param line_number line_number  from where message is logged
+   *@param file_name file name  where messag is logged
+   *@param function_name  function name from where message is logged
+   *@retval None
+   */
+  void SetLogCredentials(std::string date,
+    std::string time,
+    int line_number,
+    std::string file_name,
+    std::string function_name);
+
+  /*
+   *@brief Method to get the log credentials , prefably user may not use it.
+   *@param None
+   *@retval std::shared_ptr<logger::ExtractedLogCredentials>
+   */
+  std::shared_ptr<logger::ExtractedLogCredentials> GetLogCredentials();
+
+  /*
+   *@brief Method to set the user defined sink;
+   *@param any_sink_ptr user defined sink
+   *@retval None
+   */
+  void SetSink(std::shared_ptr<logger::ISink> any_sink_ptr);
+
 private:
   /*
-   *@brief  Check if  the input parameter is empty or not.
-   *@param message log message
+   *@brief  Check if  the  test string  is empty or not.
+   *@param any_string  test string
    *@retval bool
    */
-  bool check_empty(std::string message);
+  bool check_empty_string(std::string any_string);
 
   /*
    *@brief Object to store logger name and desired log level.
@@ -212,26 +248,38 @@ private:
    *@brief A Pointer to the class sink interface for accessing recording data.
    */
   std::shared_ptr<logger::ISink> sink_ptr;
+
+  /*
+   *@brief A Pointer to the struct ExtractedLogCredentials for storing the extracted log data such as date ,time,
+   *filename etc.
+   */
+  std::shared_ptr<logger::ExtractedLogCredentials> log_credentials;
 };
 
+/*
+ *@brief A Logger class object to be used internally to do various operations for macros.
+ */
+Logger internal_object;
+
 // Definitions for Macro associated functions.
-void logger::set_severity_level(logger::LEVEL level) { log_settings->desired_level = level; }
+void logger::set_severity_level(logger::LEVEL level) { internal_object.SetLogLevel(level); }
 
-void logger::set_sink(std::shared_ptr<ISink> any_sink_ptr) { sink_ptr = any_sink_ptr; }
+void logger::set_sink(std::shared_ptr<ISink> any_sink_ptr) { internal_object.SetSink(any_sink_ptr); }
 
-void logger::set_logger_name(std::string logger_name) { log_settings->logger_name = logger_name; }
+void logger::set_logger_name(std::string logger_name) { internal_object.SetLoggerName(logger_name); }
 
-bool logger::check_empty(std::string message,
-  std::string date,
+bool logger::check_empty_log_credentials(std::string date,
   std::string time,
-  std::string file,
-  std::string function)
+  int line_number,
+  std::string file_name,
+  std::string function_name)
 {
-  std::vector<std::string> test_string{ message, date, time, file, function };
+  std::vector<std::string> test_string{ date, time, file_name, function_name };
   for (auto x : test_string) {
-    if (x.empty()) { throw std::exception(logger::error_code::ERROR_101.c_str()); }
-  }
 
+    if (x.empty()) { throw logger::error_handling::LoggerException(logger::error_handling::LOG_CREDENTIALS_EMPTY); }
+  }
+  if (line_number == 0) { throw logger::error_handling::LoggerException(logger::error_handling::EXTRACTED_LINE_ZERO); }
   return true;
 }
 
@@ -239,23 +287,13 @@ void logger::log(logger::LEVEL level,
   std::string message,
   std::string date,
   std::string time,
-  int line,
-  std::string file,
-  std::string function)
+  int line_number,
+  std::string file_name,
+  std::string function_name)
 {
-  logger::check_empty(message, date, time, file, function);
-
-  auto log_credentials = std::make_shared<logger::ExtractedLogCredentials>();
-  log_credentials->date = date;
-  log_credentials->time = time;
-  log_credentials->line_number = line;
-  log_credentials->file_name = file;
-  log_credentials->function_name = function;
-
-  if (level <= log_settings->desired_level) {
-    auto logger_name = log_settings->logger_name;
-    sink_ptr->Record(message, level, logger_name, log_credentials);
-  }
+  check_empty_log_credentials(date, time, line_number, file_name, function_name);
+  internal_object.SetLogCredentials(date, time, line_number, file_name, function_name);
+  internal_object.Log(level, message);
 }
 
 // Defintions for the class Logger.
@@ -268,10 +306,7 @@ logger::Logger::Logger(std::shared_ptr<logger::ISink> sink_ptr, std::string logg
 
 void logger::Logger::Log(logger::LEVEL level, std::string message)
 {
-
-  auto log_credentials = std::make_shared<logger::ExtractedLogCredentials>();
-  check_empty(message);
-
+  check_empty_string(message);
   if (level <= log_setting.desired_level) {
     std::string logger_name = log_setting.logger_name;
     sink_ptr->Record(message, level, logger_name, log_credentials);
@@ -292,11 +327,31 @@ void logger::Logger::Off(std::string message) { Log(logger::LEVEL::TRACE, messag
 
 void logger::Logger::SetLogLevel(logger::LEVEL level) { log_setting.desired_level = level; }
 
-bool logger::Logger::check_empty(std::string message)
+void Logger::SetLoggerName(std::string logger_name) { log_setting.logger_name = logger_name; }
+
+void Logger::SetLogCredentials(std::string date,
+  std::string time,
+  int line_number,
+  std::string file_name,
+  std::string function_name)
 {
-  if (message.empty()) { throw std::exception(logger::error_code::ERROR_101.c_str()); }
-  return true;
+
+  this->log_credentials = std::make_shared<logger::ExtractedLogCredentials>();
+  log_credentials->date = date;
+  log_credentials->time = time;
+  log_credentials->line_number = line_number;
+  log_credentials->function_name = function_name;
+  log_credentials->file_name = file_name;
 }
 
+std::shared_ptr<logger::ExtractedLogCredentials> logger::Logger::GetLogCredentials() { return log_credentials; }
+
+void logger::Logger::SetSink(std::shared_ptr<logger::ISink> any_sink_ptr) { sink_ptr = any_sink_ptr; }
+
+bool logger::Logger::check_empty_string(std::string any_string)
+{
+  if (any_string.empty()) { throw logger::error_handling::LoggerException(logger::error_handling::DATA_EMPTY); }
+  return true;
+}
 };// namespace logger
-#endif()
+#endif() #endif()
