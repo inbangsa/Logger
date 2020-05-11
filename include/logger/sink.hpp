@@ -31,12 +31,11 @@ public:
     std::string &logger_name,
     std::shared_ptr<logger::ExtractedLogCredentials> &log_credentials);
 
+protected:
   /**
-   * @brief  A getter to access formatter_ptr.
-   * @param None
-   * @retval std::shared_ptr<logger::IFormatter>
+   * @brief Pointer to fomatter class.
    */
-  std::shared_ptr<logger::IFormatter> GetFormatterPtr();
+  std::shared_ptr<logger::IFormatter> formatter_ptr;
 
 private:
   /**
@@ -51,11 +50,6 @@ private:
     logger::LEVEL level,
     std::string &logger_name,
     std::shared_ptr<logger::ExtractedLogCredentials> &log_credentials) = 0;
-
-  /**
-   * @brief Pointer to fomatter class.
-   */
-  std::shared_ptr<logger::IFormatter> formatter_ptr;
 };
 
 /**
@@ -78,7 +72,7 @@ public:
    * @param file_name destination file name where the logs are to be recorded
    * @retval None
    */
-  void set_log_file_name(std::string log_file_name);
+  void SetLogFileName(std::string log_file_name);
 
 private:
   /**
@@ -94,9 +88,16 @@ private:
     std::string &logger_name,
     std::shared_ptr<logger::ExtractedLogCredentials> &log_credentials) override;
 
-/**
+  /**
+   * @brief Writes the formatted data to the file.
+   * @param formatted_data formatted data
+   * @retval bool
+   */
+  bool writeToFile(std::string formatted_data);
+
+  /**
    * @brief Variable to store log file name.
-*/
+   */
   std::string log_file_name;
 };
 
@@ -111,27 +112,35 @@ bool logger::ISink::Record(std::string msg,
   return this->record(msg, level, logger_name, log_credentials);
 }
 
-std::shared_ptr<logger::IFormatter> logger::ISink::GetFormatterPtr() { return this->formatter_ptr; }
-
 // Definitions of class DefaultSink methods.
 logger::DefaultSink::DefaultSink(std::shared_ptr<logger::IFormatter> formatter, std::string log_file_name)
   : ISink(formatter), log_file_name(log_file_name)
 {}
 
-void logger::DefaultSink::set_log_file_name(std::string log_file_name) { log_file_name = log_file_name; }
+void logger::DefaultSink::SetLogFileName(std::string log_file_name) { log_file_name = log_file_name; }
 
+bool logger::DefaultSink::writeToFile(std::string formatted_data)
+{
+  std::fstream fout;
+  fout.open(log_file_name, std::ios::app);
+  if (fout.is_open()) 
+  {
+	//considering corner case.if file is empty append from begining , else append from next line.
+    fout.seekg(0, std::ios::end);
+    auto length = fout.tellg();
+    if (length != 0) {fout << "\n";}
+    fout << formatted_data;
+    fout.close();
+  } 
+  return true;
+}
 bool logger::DefaultSink::record(std::string msg,
   logger::LEVEL level,
   std::string &logger_name,
   std::shared_ptr<logger::ExtractedLogCredentials> &log_credentials)
 {
-  std::ofstream out;
-  out.open(log_file_name, std::ios::app);
-  auto formatter_ptr = GetFormatterPtr(); 
-  auto formatted_string= formatter_ptr->FormatData(msg, level, logger_name, log_credentials);
-  out << formatted_string;
-  out.close();
-  return out.bad() == true ? false : true;
+  auto formatted_data = formatter_ptr->FormatData(msg, level, logger_name, log_credentials);
+  return writeToFile(formatted_data);
 }
 };// namespace logger
 

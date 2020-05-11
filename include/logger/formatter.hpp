@@ -2,7 +2,6 @@
 #define FORMATTER_HPP
 
 #include "common.hpp"
-#include "functional"
 
 namespace logger {
 /**
@@ -72,7 +71,7 @@ private:
    * @param log_credentials extracted log credentials
    * @retval std::string
    */
-  std::string square_bracket_style_format_msg(std::string msg,
+  std::string squareBracketStyleFormatMsg(std::string msg,
     logger::LEVEL level,
     std::string &logger_name,
     std::shared_ptr<logger::ExtractedLogCredentials> &log_credentials);
@@ -106,26 +105,19 @@ std::string logger::IFormatter::FormatData(std::string msg,
 }
 
 // Definitions of class DefaultFormatter.
-std::string logger::DefaultFormatter::square_bracket_style_format_msg(std::string msg,
+std::string logger::DefaultFormatter::squareBracketStyleFormatMsg(std::string msg,
   logger::LEVEL level,
   std::string &logger_name,
   std::shared_ptr<logger::ExtractedLogCredentials> &log_credentials)
 {
-  std::string formatted_string;
-  std::vector<std::string> message_chunk;
-  message_chunk.push_back(std::string{ " [Logger Name]: " } + logger_name);
-
-  if (check_log_credentials_valid(log_credentials)) {
-    message_chunk.push_back(std::string{ " [Date]: " } + log_credentials->date);
-    message_chunk.push_back(std::string{ " [Time]: " } + log_credentials->time);
-    message_chunk.push_back(std::string{ " [File Name]: " } + log_credentials->file_name);
-    message_chunk.push_back(std::string{ " [Line Number]: " } + std::to_string(log_credentials->line_number));
-    message_chunk.push_back(std::string{ " [Function Name]: " } + log_credentials->function_name);
+  std::string formatted_string; 
+  if (CheckValidLogCredentials(log_credentials)) {
+  formatted_string = "[" + log_credentials->date + "]" + " [" + log_credentials->time + "]" + " ["
+                       + log_credentials->file_name + "]" + " [" + std::to_string(log_credentials->line_number) + "]"
+                       + " [" + log_credentials->function_name+"]"+" [" + logger_name + "]" + " [" + LevelToString(level) + "]" + " [" + msg + "]";
+  } else {
+    formatted_string += "[" + logger_name + "]" + " [" + LevelToString(level) + "]" + " [" + msg + "]";
   }
-  message_chunk.push_back(std::string{ " [Level]: " } + level_to_string(level));
-  message_chunk.push_back(std::string{ " [Message]: " } + msg);
-
-  for (auto it = message_chunk.begin(); it < message_chunk.end(); it++) { formatted_string += *it; }
   return formatted_string;
 }
 
@@ -134,7 +126,7 @@ std::string logger::DefaultFormatter::format(std::string msg,
   std::string &logger_name,
   std::shared_ptr<logger::ExtractedLogCredentials> &log_credentials)
 {
-  return square_bracket_style_format_msg(msg, level, logger_name, log_credentials);
+  return squareBracketStyleFormatMsg(msg, level, logger_name, log_credentials);
 }
 
 #endif()

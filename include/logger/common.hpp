@@ -29,32 +29,30 @@ struct ExtractedLogCredentials
  * @param log_ptr data to be tested
  * @retval bool
  */
-bool check_log_credentials_valid(std::shared_ptr<logger::ExtractedLogCredentials> log_ptr)
+bool CheckValidLogCredentials(std::shared_ptr<logger::ExtractedLogCredentials> log_ptr)
 {
-  bool result = false;
+  bool result = true;
 
   // Checking for line number not be zero.
-  if (!(log_ptr->line_number == 0)) { result = true; }
+  if (log_ptr->line_number == 0) {return false; }
 
   // Checking for strings to be empty.
   std::vector<std::string> test_string = { log_ptr->date, log_ptr->time, log_ptr->file_name, log_ptr->function_name };
 
   for (auto str : test_string) {
     if (str.empty()) {
-      return result = false;
-    } else {
-      result = true;
+      return false;
     }
   }
   return result;
 }
 
 /**
- * @brief Utility function to convert log levels to string.
- * @param level log level
- * @retval string
+ *@brief Utility function to convert log levels to string.
+ *@param level log level
+ *@retval string
  */
-std::string level_to_string(logger::LEVEL level)
+std::string LevelToString(logger::LEVEL level)
 {
   switch (level) {
   case logger::LEVEL::OFF:
@@ -65,10 +63,9 @@ std::string level_to_string(logger::LEVEL level)
     return std ::string{ "ERROR" };
   case logger::LEVEL::DEBUG:
     return std::string{ "DEBUG" };
-  case logger::LEVEL::TRACE:
-    return std::string{ "TRACE" };
   case logger::LEVEL::WARN:
     return std::string{ "WARN" };
+  case logger::LEVEL::TRACE:
   default:
     return std::string{ "TRACE" };
   }
