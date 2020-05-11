@@ -75,6 +75,7 @@ ExtractedLogCredentials::ExtractedLogCredentials(const std::string& date,
 
 bool ExtractedLogCredentials::CheckValidLogCredentials() const
 {
+
   return !(date.empty() || time.empty() || function_name.empty() || file_name.empty() || line_number==0);
 }
 };// namespace internal
