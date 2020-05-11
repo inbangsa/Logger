@@ -2,6 +2,7 @@
 #define FORMATTER_HPP
 
 #include "common.hpp"
+#include "functional"
 
 namespace logger {
 /**
@@ -24,7 +25,7 @@ public:
    */
   std::string GetFormatPattern() const;
 
-   /**
+  /**
    * @brief Interface for accessing format function.
    * @param msg log message
    * @param level log level
@@ -53,10 +54,45 @@ private:
 
   /**
    * @brief User can set the format pattern depending upon which the data will be formatted.
- */
+   */
   std::string format_pattern;
 };
 
+/**
+ * @brief DefaultFormatter Formats the data in a default format style,square brackets.
+ */
+class DefaultFormatter : public logger::IFormatter
+{
+private:
+  /**
+   * @brief Formats the data in a default format style,square brackets.
+   * @param msg log message
+   * @param level log level
+   * @param logger_name logger name
+   * @param log_credentials extracted log credentials
+   * @retval std::string
+   */
+  std::string square_bracket_style_format_msg(std::string msg,
+    logger::LEVEL level,
+    std::string &logger_name,
+    std::shared_ptr<logger::ExtractedLogCredentials> &log_credentials);
+
+  /**
+   * @brief Functions gives call to one of the default type format function like square bracket or printf style format.
+   * @param msg log message
+   * @param level log level
+   * @param logger_name logger name
+   * @param log_credentials extracted log credentials
+   * @retval std::string
+   */
+  std::string format(std::string msg,
+    logger::LEVEL level,
+    std::string &logger_name,
+    std::shared_ptr<logger::ExtractedLogCredentials> &log_credentials) override;
+};
+};// namespace logger
+
+// Definitions of class IFormatter
 void logger::IFormatter::SetFormatPattern(std::string format_pattern) { this->format_pattern = format_pattern; }
 
 std::string logger::IFormatter::GetFormatPattern() const { return format_pattern; }
@@ -68,5 +104,37 @@ std::string logger::IFormatter::FormatData(std::string msg,
 {
   return this->format(msg, level, logger_name, log_credentials);
 }
-};// namespace logger
+
+// Definitions of class DefaultFormatter.
+std::string logger::DefaultFormatter::square_bracket_style_format_msg(std::string msg,
+  logger::LEVEL level,
+  std::string &logger_name,
+  std::shared_ptr<logger::ExtractedLogCredentials> &log_credentials)
+{
+  std::string formatted_string;
+  std::vector<std::string> message_chunk;
+  message_chunk.push_back(std::string{ " [Logger Name]: " } + logger_name);
+
+  if (check_log_credentials_valid(log_credentials)) {
+    message_chunk.push_back(std::string{ " [Date]: " } + log_credentials->date);
+    message_chunk.push_back(std::string{ " [Time]: " } + log_credentials->time);
+    message_chunk.push_back(std::string{ " [File Name]: " } + log_credentials->file_name);
+    message_chunk.push_back(std::string{ " [Line Number]: " } + std::to_string(log_credentials->line_number));
+    message_chunk.push_back(std::string{ " [Function Name]: " } + log_credentials->function_name);
+  }
+  message_chunk.push_back(std::string{ " [Level]: " } + level_to_string(level));
+  message_chunk.push_back(std::string{ " [Message]: " } + msg);
+
+  for (auto it = message_chunk.begin(); it < message_chunk.end(); it++) { formatted_string += *it; }
+  return formatted_string;
+}
+
+std::string logger::DefaultFormatter::format(std::string msg,
+  logger::LEVEL level,
+  std::string &logger_name,
+  std::shared_ptr<logger::ExtractedLogCredentials> &log_credentials)
+{
+  return square_bracket_style_format_msg(msg, level, logger_name, log_credentials);
+}
+
 #endif()

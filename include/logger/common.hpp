@@ -3,6 +3,7 @@
 
 #include <memory>
 #include <string>
+#include <vector>
 
 namespace logger {
 /**
@@ -22,5 +23,56 @@ struct ExtractedLogCredentials
   std::string function_name = "";
   int line_number = 0;
 };
+
+/**
+ * @brief Utiltiy function to check whether all the data like date, time etc are captured or not.
+ * @param log_ptr data to be tested
+ * @retval bool
+ */
+bool check_log_credentials_valid(std::shared_ptr<logger::ExtractedLogCredentials> log_ptr)
+{
+  bool result = false;
+
+  // Checking for line number not be zero.
+  if (!(log_ptr->line_number == 0)) { result = true; }
+
+  // Checking for strings to be empty.
+  std::vector<std::string> test_string = { log_ptr->date, log_ptr->time, log_ptr->file_name, log_ptr->function_name };
+
+  for (auto str : test_string) {
+    if (str.empty()) {
+      return result = false;
+    } else {
+      result = true;
+    }
+  }
+  return result;
+}
+
+/**
+ * @brief Utility function to convert log levels to string.
+ * @param level log level
+ * @retval string
+ */
+std::string level_to_string(logger::LEVEL level)
+{
+  switch (level) {
+  case logger::LEVEL::OFF:
+    return std::string{ "OFF" };
+  case logger::LEVEL::FATAL:
+    return std::string{ "FATAL" };
+  case logger::LEVEL::ERROR:
+    return std ::string{ "ERROR" };
+  case logger::LEVEL::DEBUG:
+    return std::string{ "DEBUG" };
+  case logger::LEVEL::TRACE:
+    return std::string{ "TRACE" };
+  case logger::LEVEL::WARN:
+    return std::string{ "WARN" };
+  default:
+    return std::string{ "TRACE" };
+  }
+}
 };// namespace logger
+// namespace logger
 #endif()
