@@ -52,7 +52,6 @@ public:
    * @retval bool
    */
   bool CheckValidLogCredentials()const;
-
   /**
    * @brief Variable to store date, time, function name and file name related to logging of message.
    */
