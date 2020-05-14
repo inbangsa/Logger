@@ -3,6 +3,7 @@
 
 #include "formatter.hpp"
 #include <fstream>
+#include <exception>
 
 namespace logger {
 /**
@@ -123,17 +124,19 @@ bool logger::DefaultSink::writeToFile(std::string formatted_data)
 {
   std::fstream fout;
   fout.open(log_file_name, std::ios::app);
+
   if (fout.is_open()) 
   {
-	//considering corner case.if file is empty append from begining , else append from next line.
-    fout.seekg(0, std::ios::end);
-    auto length = fout.tellg();
-    if (length != 0) {fout << "\n";}
-    fout << formatted_data;
+    fout<<formatted_data<<std::endl;
     fout.close();
+    return true;
+  }
+  else{
+ // To be updated later when error handling will be dealt .
+  throw std::exception("File cannot be opened!");
   } 
-  return true;
-}
+  }
+
 bool logger::DefaultSink::record(std::string msg,
   logger::LEVEL level,
   std::string &logger_name,
