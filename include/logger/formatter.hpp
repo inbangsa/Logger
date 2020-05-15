@@ -15,7 +15,7 @@ public:
    * @param format_pattern pattern that will be used to format  the data
    * @retval std::string
    */
-  void SetFormatPattern(std::string format_pattern);
+  void SetFormatPattern(const std::string format_pattern);
 
   /**
    * @brief Returns formatting pattern.
@@ -27,29 +27,29 @@ public:
   /**
    * @brief Interface for accessing format function.
    * @param msg log message
-   * @param level log level
+   * @param log_level log log_level
    * @param logger_name default name is root
    * @param log_credentials extracted log credentials
    * @retval std::string
    */
-  std::string FormatData(std::string msg,
-    logger::LEVEL level,
-    std::string &logger_name,
-    std::shared_ptr<logger::ExtractedLogCredentials> &log_credentials);
+  std::string FormatData(const std::string msg,
+    const logger::log_level log_level,
+    const std::string logger_name,
+    const std::shared_ptr<logger::ExtractedLogCredentials> &log_credentials);
 
 private:
   /**
    * @brief Formats the given data.
    * @param msg log message
-   * @param level log level
+   * @param log_level log log_level
    * @param logger_name default name is root
    * @param log_credentials extracted log credentials
    * @retval std::string
    */
-  virtual std::string format(std::string msg,
-    logger::LEVEL level,
-    std::string &logger_name,
-    std::shared_ptr<logger::ExtractedLogCredentials> &log_credentials) = 0;
+  virtual std::string format(const std::string msg,
+    const logger::log_level log_level,
+    const std::string logger_name,
+    const std::shared_ptr<logger::ExtractedLogCredentials> &log_credentials) = 0;
 
   /**
    * @brief User can set the format pattern depending upon which the data will be formatted.
@@ -66,67 +66,68 @@ private:
   /**
    * @brief Formats the data in a default format style,square brackets.
    * @param msg log message
-   * @param level log level
+   * @param log_level log log_level
    * @param logger_name logger name
    * @param log_credentials extracted log credentials
    * @retval std::string
    */
-  std::string squareBracketStyleFormatMsg(std::string msg,
-    logger::LEVEL level,
-    std::string &logger_name,
-    std::shared_ptr<logger::ExtractedLogCredentials> &log_credentials);
+  std::string squareBracketStyleFormatMsg(const std::string msg,
+    const logger::log_level log_level,
+    const std::string logger_name,
+    const std::shared_ptr<logger::ExtractedLogCredentials> &log_credentials);
 
   /**
    * @brief Functions gives call to one of the default type format function like square bracket or printf style format.
    * @param msg log message
-   * @param level log level
+   * @param log_level log log_level
    * @param logger_name logger name
    * @param log_credentials extracted log credentials
    * @retval std::string
    */
-  std::string format(std::string msg,
-    logger::LEVEL level,
-    std::string &logger_name,
-    std::shared_ptr<logger::ExtractedLogCredentials> &log_credentials) override;
+  std::string format(const std::string msg,
+    const logger::log_level log_level,
+    const std::string logger_name,
+    const std::shared_ptr<logger::ExtractedLogCredentials> &log_credentials) override;
 };
 };// namespace logger
 
 // Definitions of class IFormatter
-void logger::IFormatter::SetFormatPattern(std::string format_pattern) { this->format_pattern = format_pattern; }
+void logger::IFormatter::SetFormatPattern(const std::string format_pattern) { this->format_pattern = format_pattern; }
 
 std::string logger::IFormatter::GetFormatPattern() const { return format_pattern; }
 
-std::string logger::IFormatter::FormatData(std::string msg,
-  logger::LEVEL level,
-  std::string &logger_name,
-  std::shared_ptr<logger::ExtractedLogCredentials> &log_credentials)
+std::string logger::IFormatter::FormatData(const std::string msg,
+  const logger::log_level log_level,
+  const std::string logger_name,
+  const std::shared_ptr<logger::ExtractedLogCredentials> &log_credentials)
 {
-  return this->format(msg, level, logger_name, log_credentials);
+  return this->format(msg, log_level, logger_name, log_credentials);
 }
 
 // Definitions of class DefaultFormatter.
-std::string logger::DefaultFormatter::squareBracketStyleFormatMsg(std::string msg,
-  logger::LEVEL level,
-  std::string &logger_name,
-  std::shared_ptr<logger::ExtractedLogCredentials> &log_credentials)
+std::string logger::DefaultFormatter::squareBracketStyleFormatMsg(const std::string msg,
+  const logger::log_level log_level,
+  const std::string logger_name,
+  const std::shared_ptr<logger::ExtractedLogCredentials> &log_credentials)
 {
-  std::string formatted_string; 
+  const auto log_log_level_string = log_log_level_to_string.find(log_level)->second;
+  std::string formatted_string;
   if (CheckValidLogCredentials(log_credentials)) {
-  formatted_string = "[" + log_credentials->date + "]" + " [" + log_credentials->time + "]" + " ["
+    formatted_string = "[" + log_credentials->date + "]" + " [" + log_credentials->time + "]" + " ["
                        + log_credentials->file_name + "]" + " [" + std::to_string(log_credentials->line_number) + "]"
-                       + " [" + log_credentials->function_name+"]"+" [" + logger_name + "]" + " [" + LevelToString(level) + "]" + " [" + msg + "]";
+                       + " [" + log_credentials->function_name + "]" + " [" + logger_name + "]" + " ["
+                       + log_log_level_string + "]" + " [" + msg + "]";
   } else {
-    formatted_string += "[" + logger_name + "]" + " [" + LevelToString(level) + "]" + " [" + msg + "]";
+    formatted_string += "[" + logger_name + "]" + " [" + log_log_level_string + "]" + " [" + msg + "]";
   }
   return formatted_string;
 }
 
-std::string logger::DefaultFormatter::format(std::string msg,
-  logger::LEVEL level,
-  std::string &logger_name,
-  std::shared_ptr<logger::ExtractedLogCredentials> &log_credentials)
+std::string logger::DefaultFormatter::format(const std::string msg,
+  const logger::log_level log_level,
+  const std::string logger_name,
+  const std::shared_ptr<logger::ExtractedLogCredentials> &log_credentials)
 {
-  return squareBracketStyleFormatMsg(msg, level, logger_name, log_credentials);
+  return squareBracketStyleFormatMsg(msg, log_level, logger_name, log_credentials);
 }
-
 #endif()

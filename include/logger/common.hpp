@@ -3,13 +3,14 @@
 
 #include <memory>
 #include <string>
+#include <map>
 #include <vector>
 
 namespace logger {
 /**
- * @brief  Log level with their severity order , 0 =>high priority , 5=> least priority.
+ * @brief  Log log_level with their severity order , 0 =>high priority , 5=> least priority.
  */
-enum class LEVEL : int { OFF = 0, FATAL = 1, ERROR = 2, WARN = 3, DEBUG = 4, TRACE = 5 };
+enum class log_level : int { OFF = 0, FATAL = 1, ERROR = 2, WARN = 3, DEBUG = 4, TRACE = 5 };
 
 /**
  * @brief  Interface for the extracted log data like file name , function name etc , one may extend for more
@@ -32,44 +33,28 @@ struct ExtractedLogCredentials
 bool CheckValidLogCredentials(std::shared_ptr<logger::ExtractedLogCredentials> log_ptr)
 {
   bool result = true;
-
+  
   // Checking for line number not be zero.
-  if (log_ptr->line_number == 0) {return false; }
-
+  if (log_ptr->line_number == 0) { return false; }
+  
   // Checking for strings to be empty.
-  std::vector<std::string> test_string = { log_ptr->date, log_ptr->time, log_ptr->file_name, log_ptr->function_name };
-
+  const std::vector<std::string> test_string = {
+    log_ptr->date, log_ptr->time, log_ptr->file_name, log_ptr->function_name
+  };  
   for (auto str : test_string) {
-    if (str.empty()) {
-      return false;
-    }
+    if (str.empty()) { return false; }
   }
   return result;
 }
 
 /**
- *@brief Utility function to convert log levels to string.
- *@param level log level
- *@retval string
+ *@brief Utility map to store log_levels as key and corresponding value as its equivalent string.
  */
-std::string LevelToString(logger::LEVEL level)
-{
-  switch (level) {
-  case logger::LEVEL::OFF:
-    return std::string{ "OFF" };
-  case logger::LEVEL::FATAL:
-    return std::string{ "FATAL" };
-  case logger::LEVEL::ERROR:
-    return std ::string{ "ERROR" };
-  case logger::LEVEL::DEBUG:
-    return std::string{ "DEBUG" };
-  case logger::LEVEL::WARN:
-    return std::string{ "WARN" };
-  case logger::LEVEL::TRACE:
-  default:
-    return std::string{ "TRACE" };
-  }
-}
+const std::map<logger::log_level, std::string> log_log_level_to_string{ { logger::log_level::OFF, "OFF" },
+  { logger::log_level::FATAL, "FATAL" },
+  { logger::log_level::ERROR, "ERROR" },
+  { logger::log_level::WARN, "WARN" },
+  { logger::log_level::DEBUG, "DEBUG" },
+  { logger::log_level::TRACE, "TRACE" } };
 };// namespace logger
-// namespace logger
 #endif()
