@@ -8,13 +8,13 @@
 
 namespace logger {
 /**
- * @brief  Log log_level with their severity order , 0 =>high priority , 5=> least priority.
+ * @brief  Log Levels with their severity order , 0 =>high priority , 5=> least priority.
  */
 enum class log_level : int { OFF = 0, FATAL = 1, ERROR = 2, WARN = 3, DEBUG = 4, TRACE = 5 };
 
 /**
  * @brief  Interface for the extracted log data like file name , function name etc , one may extend for more
- * parameters such as number of argumnets __VA_ARGS__.
+ * parameters such as number of arguments __VA_ARGS__.
  */
 struct ExtractedLogCredentials
 {
