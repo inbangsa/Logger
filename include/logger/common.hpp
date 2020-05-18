@@ -30,17 +30,17 @@ struct ExtractedLogCredentials
  * @param log_ptr data to be tested
  * @retval bool
  */
-bool CheckValidLogCredentials(std::shared_ptr<logger::ExtractedLogCredentials> log_ptr)
+bool CheckValidLogCredentials(const std::shared_ptr<logger::ExtractedLogCredentials> &log_ptr)
 {
   bool result = true;
-  
+
   // Checking for line number not be zero.
   if (log_ptr->line_number == 0) { return false; }
-  
+
   // Checking for strings to be empty.
   const std::vector<std::string> test_string = {
     log_ptr->date, log_ptr->time, log_ptr->file_name, log_ptr->function_name
-  };  
+  };
   for (auto str : test_string) {
     if (str.empty()) { return false; }
   }
@@ -50,7 +50,7 @@ bool CheckValidLogCredentials(std::shared_ptr<logger::ExtractedLogCredentials> l
 /**
  *@brief Utility map to store log_levels as key and corresponding value as its equivalent string.
  */
-const std::map<logger::log_level, std::string> log_log_level_to_string{ { logger::log_level::OFF, "OFF" },
+const std::map<logger::log_level, const std::string> log_level_to_string{ { logger::log_level::OFF, "OFF" },
   { logger::log_level::FATAL, "FATAL" },
   { logger::log_level::ERROR, "ERROR" },
   { logger::log_level::WARN, "WARN" },
