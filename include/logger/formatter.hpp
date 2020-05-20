@@ -113,9 +113,9 @@ std::string logger::DefaultFormatter::squareBracketStyleFormatMsg(const std::str
   const auto log_level_string = log_level_to_string.find(log_level)->second;
   std::string formatted_string;
   if (log_credentials->CheckValidLogCredentials()) {
-    formatted_string = "[" + log_credentials->GetDate() + "]" + " [" + log_credentials->GetTime() + "]" + " ["
-                       + log_credentials->GetFileName() + "]" + " [" + std::to_string(log_credentials->GetLineNumber())
-                       + "]" + " [" + log_credentials->GetFunctionName() + "]" + " [" + logger_name + "]" + " ["
+    formatted_string = "[" + log_credentials->date + "]" + " [" + log_credentials->time + "]" + " ["
+                       + log_credentials->file_name + "]" + " [" + std::to_string(log_credentials->line_number)
+                       + "]" + " [" + log_credentials->function_name + "]" + " [" + logger_name + "]" + " ["
                        + log_level_string + "]" + " [" + msg + "]";
   } else {
     formatted_string += "[" + logger_name + "]" + " [" + log_level_string + "]" + " [" + msg + "]";

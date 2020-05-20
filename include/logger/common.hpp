@@ -37,11 +37,11 @@ public:
    * @param line_number  line number of  the logged message    *
    * @retval None
    */
-  ExtractedLogCredentials(const std::string& date = "",
-    const std::string& time = "",
-    const std::string& file_name = "",
-    const std::string& function_name = "",
-    const int& line_number = 0);
+  ExtractedLogCredentials(const std::string& date,
+    const std::string& time,
+    const std::string& file_name,
+    const std::string& function_name,
+    const int& line_number);
 
   /**
    * @brief Method to check whether all the data like date, time etc are captured or not.
@@ -49,52 +49,15 @@ public:
    */
   bool CheckValidLogCredentials();
 
-  /** @defgroup group1 Getters
-   * Getters
-   * @{
-   */
-
-  /**
-   * @brief Returns the date at which message was logged.
-   * @retval None
-   */
-  std::string GetDate() const;
-
-  /**
-   * @brief Returns time at which message was logged.
-   * @retval None
-   */
-  std::string GetTime() const;
-
-  /**
-   * @brief Returns the function name where message was logged.
-   * @retval None
-   */
-  std::string GetFunctionName() const;
-
-  /**
-   * @brief Returns the file name where message was logged.
-   * @retval None
-   */
-  std::string GetFileName() const;
-
-  /**
-   * @brief Returns the line number where message was logged.
-   * @retval None
-   */
-  int GetLineNumber() const;
-  /** @} */// end of group1 setters.
-
-private:
   /**
    * @brief Variable to store date, time, function name and file name related to logging of message.
    */
-  std::string date, time, file_name, function_name;
+  const std::string date, time, file_name, function_name;
 
   /**
    * @brief Variable to store line number related to logging of message.
    */
-  int line_number;
+  const int line_number = 0;
 };
 
 // Definitions of methods of class ExtractLogCredentials.
@@ -103,7 +66,7 @@ ExtractedLogCredentials::ExtractedLogCredentials(const std::string& date,
   const std::string& file_name,
   const std::string& function_name,
   const int& line_number)
-  : date(date), time(time), file_name(file_name), function_name(function_name)
+  : date(date), time(time), file_name(file_name), function_name(function_name), line_number(line_number)
 {}
 
 bool ExtractedLogCredentials::CheckValidLogCredentials()
@@ -111,24 +74,18 @@ bool ExtractedLogCredentials::CheckValidLogCredentials()
   bool result = true;
 
   // Checking for line number not be zero.
-  if (line_number == 0) { return false; }
+  if (line_number == 0 ){ return false; }
 
   // Checking for strings to be empty.
-  const std::vector<std::string> test_string = { date, time, file_name, function_name };
-  for (const auto& str : test_string) {
-    if (str.empty()) { return false; }
+  if (date.empty()) { return false; }
+  else if (time.empty()) {
+    return false;
+  } else if (function_name.empty()) {
+    return false;
+  } else if (file_name.empty()) {
+    return false;
   }
   return result;
 }
-
-std::string ExtractedLogCredentials::GetDate() const { return date; }
-
-std::string ExtractedLogCredentials::GetTime() const { return time; }
-
-std::string ExtractedLogCredentials::GetFunctionName() const { return function_name; }
-
-std::string ExtractedLogCredentials::GetFileName() const { return file_name; }
-
-int ExtractedLogCredentials::GetLineNumber() const { return line_number; }
 };// namespace logger
 #endif()
