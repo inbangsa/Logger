@@ -35,7 +35,7 @@ public:
   std::string FormatData(const std::string& msg,
     const logger::log_level& log_level,
     const std::string& logger_name,
-    std::shared_ptr<logger::ExtractedLogCredentials> log_credentials);
+    const logger::internal::ExtractedLogCredentials& log_credentials);
 
 private:
   /**
@@ -49,7 +49,7 @@ private:
   virtual std::string format(const std::string& msg,
     const logger::log_level& log_level,
     const std::string& logger_name,
-    std::shared_ptr<logger::ExtractedLogCredentials> log_credentials) = 0;
+    const logger::internal::ExtractedLogCredentials& log_credentials) = 0;
 
   /**
    * @brief User can set the format pattern depending upon which the data will be formatted.
@@ -74,7 +74,7 @@ private:
   std::string squareBracketStyleFormatMsg(const std::string& msg,
     const logger::log_level& log_level,
     const std::string& logger_name,
-    std::shared_ptr<logger::ExtractedLogCredentials> log_credentials);
+    const logger::internal::ExtractedLogCredentials& log_credentials);
 
   /**
    * @brief Functions gives call to one of the default type format function like square bracket or printf style format.
@@ -87,7 +87,7 @@ private:
   std::string format(const std::string& msg,
     const logger::log_level& log_level,
     const std::string& logger_name,
-    std::shared_ptr<logger::ExtractedLogCredentials> log_credentials) override;
+    const logger::internal::ExtractedLogCredentials& log_credentials) override;
 };
 };// namespace logger
 
@@ -99,7 +99,7 @@ std::string logger::IFormatter::GetFormatPattern() const { return format_pattern
 std::string logger::IFormatter::FormatData(const std::string& msg,
   const logger::log_level& log_level,
   const std::string& logger_name,
-  std::shared_ptr<logger::ExtractedLogCredentials> log_credentials)
+ const logger::internal::ExtractedLogCredentials& log_credentials)
 {
   return this->format(msg, log_level, logger_name, log_credentials);
 }
@@ -108,14 +108,15 @@ std::string logger::IFormatter::FormatData(const std::string& msg,
 std::string logger::DefaultFormatter::squareBracketStyleFormatMsg(const std::string& msg,
   const logger::log_level& log_level,
   const std::string& logger_name,
-  std::shared_ptr<logger::ExtractedLogCredentials> log_credentials)
+  const logger::internal::ExtractedLogCredentials& log_credentials)
 {
-  const auto log_level_string = log_level_to_string.find(log_level)->second;
+  const auto log_level_string = logger::internal::log_level_to_string.find(log_level)->second;
   std::string formatted_string;
-  if (log_credentials->CheckValidLogCredentials()) {
-    formatted_string = "[" + log_credentials->date + "]" + " [" + log_credentials->time + "]" + " ["
-                       + log_credentials->file_name + "]" + " [" + std::to_string(log_credentials->line_number)
-                       + "]" + " [" + log_credentials->function_name + "]" + " [" + logger_name + "]" + " ["
+  if (log_credentials.CheckValidLogCredentials())
+  {
+    formatted_string = "[" + log_credentials.date + "]" + " [" + log_credentials.time + "]" + " ["
+                       + log_credentials.file_name + "]" + " [" + std::to_string(log_credentials.line_number)
+                       + "]" + " [" + log_credentials.function_name + "]" + " [" + logger_name + "]" + " ["
                        + log_level_string + "]" + " [" + msg + "]";
   } else {
     formatted_string += "[" + logger_name + "]" + " [" + log_level_string + "]" + " [" + msg + "]";
@@ -126,7 +127,7 @@ std::string logger::DefaultFormatter::squareBracketStyleFormatMsg(const std::str
 std::string logger::DefaultFormatter::format(const std::string& msg,
   const logger::log_level& log_level,
   const std::string& logger_name,
-  std::shared_ptr<logger::ExtractedLogCredentials> log_credentials)
+  const logger::internal::ExtractedLogCredentials& log_credentials)
 {
   return squareBracketStyleFormatMsg(msg, log_level, logger_name, log_credentials);
 }

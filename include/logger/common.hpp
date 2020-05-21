@@ -13,6 +13,10 @@ namespace logger {
 enum class log_level : int { OFF = 0, FATAL = 1, ERROR = 2, WARN = 3, DEBUG = 4, TRACE = 5 };
 
 /**
+ *@brief Namespace for utilities, internal to the lib .Users of the lib are not expected to use it.
+ */
+namespace internal {
+/**
  *@brief Utility map to store log_levels as key and corresponding value as its equivalent string.
  */
 const std::map<logger::log_level, const std::string> log_level_to_string{ { logger::log_level::OFF, "OFF" },
@@ -37,17 +41,17 @@ public:
    * @param line_number  line number of  the logged message    *
    * @retval None
    */
-  ExtractedLogCredentials(const std::string& date,
-    const std::string& time,
-    const std::string& file_name,
-    const std::string& function_name,
-    const int& line_number);
+  ExtractedLogCredentials(const std::string& date="",
+    const std::string& time="",
+    const std::string& file_name="",
+    const std::string& function_name="",
+    const int& line_number=0);
 
   /**
    * @brief Method to check whether all the data like date, time etc are captured or not.
    * @retval bool
    */
-  bool CheckValidLogCredentials();
+  bool CheckValidLogCredentials()const;
 
   /**
    * @brief Variable to store date, time, function name and file name related to logging of message.
@@ -57,7 +61,7 @@ public:
   /**
    * @brief Variable to store line number related to logging of message.
    */
-  const int line_number = 0;
+  const int line_number;
 };
 
 // Definitions of methods of class ExtractLogCredentials.
@@ -69,23 +73,10 @@ ExtractedLogCredentials::ExtractedLogCredentials(const std::string& date,
   : date(date), time(time), file_name(file_name), function_name(function_name), line_number(line_number)
 {}
 
-bool ExtractedLogCredentials::CheckValidLogCredentials()
+bool ExtractedLogCredentials::CheckValidLogCredentials() const
 {
-  bool result = true;
-
-  // Checking for line number not be zero.
-  if (line_number == 0 ){ return false; }
-
-  // Checking for strings to be empty.
-  if (date.empty()) { return false; }
-  else if (time.empty()) {
-    return false;
-  } else if (function_name.empty()) {
-    return false;
-  } else if (file_name.empty()) {
-    return false;
-  }
-  return result;
+  return !(date.empty() || time.empty() || function_name.empty() || file_name.empty() || line_number==0);
 }
+};// namespace internal
 };// namespace logger
 #endif()

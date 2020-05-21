@@ -30,7 +30,7 @@ public:
   void Record(const std::string &msg,
     const logger::log_level &log_level,
     const std::string &logger_name,
-    std::shared_ptr<logger::ExtractedLogCredentials> log_credentials);
+   const logger::internal::ExtractedLogCredentials& log_credentials);
 
 protected:
   /**
@@ -50,7 +50,7 @@ private:
   virtual void record(const std::string &msg,
     const logger::log_level &log_level,
     const std::string &logger_name,
-    std::shared_ptr<logger::ExtractedLogCredentials> log_credentials) = 0;
+   const logger::internal::ExtractedLogCredentials& log_credentials) = 0;
 };
 
 /**
@@ -87,7 +87,7 @@ private:
   void record(const std::string &msg,
     const logger::log_level &log_level,
     const std::string &logger_name,
-    std::shared_ptr<logger::ExtractedLogCredentials> log_credentials) override;
+   const logger::internal::ExtractedLogCredentials& log_credentials) override;
 
   /**
    * @brief Writes the formatted data to the file.
@@ -108,7 +108,7 @@ ISink::ISink( std::shared_ptr<logger::IFormatter> formatter_ptr) : formatter_ptr
 void logger::ISink::Record(const std::string &msg,
   const logger::log_level &log_level,
   const std::string &logger_name,
-  std::shared_ptr<logger::ExtractedLogCredentials> log_credentials)
+  const logger::internal::ExtractedLogCredentials& log_credentials)
 {
   this->record(msg, log_level, logger_name, log_credentials);
 }
@@ -135,7 +135,7 @@ void logger::DefaultSink::writeToFile(const std::string &formatted_data)
 void logger::DefaultSink::record(const std::string &msg,
   const logger::log_level &log_level,
   const std::string &logger_name,
-   std::shared_ptr<logger::ExtractedLogCredentials> log_credentials)
+  const logger::internal::ExtractedLogCredentials& log_credentials)
 {
   auto formatted_data = formatter_ptr->FormatData(msg, log_level, logger_name, log_credentials);
   this->writeToFile(formatted_data);
