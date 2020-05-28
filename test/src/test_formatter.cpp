@@ -24,7 +24,7 @@ TEST_CASE("Formatter formats given data based on ExtractLogCredentialas Paramete
   SECTION("Format data to string logger name and level when any params of ExtractLogCredentials are empty or zero", "[FormatDataWithSomeParams]")
   {
     const logger::internal::ExtractedLogCredentials log_credentials("", __TIME__, __FILE__, function_name,0);
-    const std::string desired_result =" ["+ logger_name + "]" + " [" + log_level_string + "]" + " [" + msg + "]";
+    const std::string desired_result ="["+ logger_name + "]" + " [" + log_level_string + "]" + " [" + msg + "]";
     REQUIRE(default_formatter.FormatData(msg, level, logger_name, log_credentials) == desired_result);
   }
 }
