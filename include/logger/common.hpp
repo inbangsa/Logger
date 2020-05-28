@@ -51,7 +51,7 @@ public:
    * @brief Method to check whether all the data like date, time etc are captured or not.
    * @retval bool
    */
-  bool CheckValidLogCredentials()const;
+  bool IsCheckValidLogCredentials()const;
 
   /**
    * @brief Variable to store date, time, function name and file name related to logging of message.
@@ -73,7 +73,7 @@ ExtractedLogCredentials::ExtractedLogCredentials(const std::string& date,
   : date(date), time(time), file_name(file_name), function_name(function_name), line_number(line_number)
 {}
 
-bool ExtractedLogCredentials::CheckValidLogCredentials() const
+bool ExtractedLogCredentials::IsCheckValidLogCredentials() const
 {
   return !(date.empty() || time.empty() || function_name.empty() || file_name.empty() || line_number==0);
 }

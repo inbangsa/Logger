@@ -112,7 +112,7 @@ std::string logger::DefaultFormatter::squareBracketStyleFormatMsg(const std::str
 {
   const auto log_level_string = logger::internal::log_level_to_string.find(log_level)->second;
   std::string formatted_string;
-  if (log_credentials.CheckValidLogCredentials())
+  if (log_credentials.IsCheckValidLogCredentials())
   {
     formatted_string = "[" + log_credentials.date + "]" + " [" + log_credentials.time + "]" + " ["
                        + log_credentials.file_name + "]" + " [" + std::to_string(log_credentials.line_number)
