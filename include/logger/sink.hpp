@@ -1,17 +1,15 @@
 #ifndef SINK_HPP
 #define SINK_HPP
 
-#include <iostream>
-#include <fstream>
 #include "formatter.hpp"
+#include <iostream>
 #include <fstream>
 #include <exception>
 
-namespace logger
-{
-  /**
-   * @brief Interface for writing the formatted data/log details to a sink such as file, database, webserver etc.
-   */
+namespace logger {
+/**
+ * @brief Interface for writing the formatted data/log details to a sink such as file, database, webserver etc.
+ */
 class ISink
 {
 public:
@@ -21,7 +19,7 @@ public:
    * @retval None
    */
 
-  ISink(std::shared_ptr<logger::IFormatter> formatter_ptr);
+  ISink(std::shared_ptr<logger::IFormatter> formatter_ptr) : formatter_ptr(formatter_ptr) {}
 
   /**
    * @brief To access the record method.
@@ -31,10 +29,13 @@ public:
    * @param log_credentials extracted log credentials
    * @retval None
    */
-  void Record(const std::string &msg,
-    const logger::log_level &log_level,
-    const std::string &logger_name,
-   const logger::internal::ExtractedLogCredentials& log_credentials);
+  void Record(const std::string& msg,
+    const logger::log_level& log_level,
+    const std::string& logger_name,
+    const logger::internal::ExtractedLogCredentials& log_credentials)
+  {
+    this->record(msg, log_level, logger_name, log_credentials);
+  }
 
 protected:
   /**
@@ -51,10 +52,10 @@ private:
    * @param log_credentials extracted log credentials
    * @retval None
    */
-  virtual void record(const std::string &msg,
-    const logger::log_level &log_level,
-    const std::string &logger_name,
-   const logger::internal::ExtractedLogCredentials& log_credentials) = 0;
+  virtual void record(const std::string& msg,
+    const logger::log_level& log_level,
+    const std::string& logger_name,
+    const logger::internal::ExtractedLogCredentials& log_credentials) = 0;
 };
 
 /**
@@ -70,14 +71,16 @@ public:
    * @retval None
    */
   DefaultSink(std::shared_ptr<logger::IFormatter> formatter = std::make_shared<logger::DefaultFormatter>(),
-    const std::string &log_file_name = "logs.txt");
+    const std::string& log_file_name = "logs.txt")
+    : ISink(formatter), log_file_name(log_file_name)
+  {}
 
   /**
    * @brief Sets destination file name where the logs are to be recorded.
    * @param file_name destination file name where the logs are to be recorded
    * @retval None
    */
-  void SetLogFileName(const std::string &log_file_name);
+  void SetLogFileName(const std::string& log_file_name) { this->log_file_name = log_file_name; }
 
 private:
   /**
@@ -88,61 +91,36 @@ private:
    * @param log_credentials extracted log credentials
    * @retval None
    */
-  void record(const std::string &msg,
-    const logger::log_level &log_level,
-    const std::string &logger_name,
-   const logger::internal::ExtractedLogCredentials& log_credentials) override;
+  void record(const std::string& msg,
+    const logger::log_level& log_level,
+    const std::string& logger_name,
+    const logger::internal::ExtractedLogCredentials& log_credentials) override
+  {
+    auto formatted_data = formatter_ptr->FormatData(msg, log_level, logger_name, log_credentials);
+    this->writeToFile(formatted_data);
+  }
 
   /**
    * @brief Writes the formatted data to the file.
    * @param formatted_data formatted data
    * @retval None
    */
-  void writeToFile(const std::string &formatted_data);
+  void writeToFile(const std::string& formatted_data)
+  {
+    std::fstream fout;
+    fout.open(log_file_name, std::ios::app);
+    if (fout.is_open()) {
+      fout << formatted_data << std::endl;
+      fout.close();
+    } else {
+      throw std::exception("File cannot be opened !!");
+    }
+  }
 
   /**
    * @brief Variable to store log file name.
    */
   std::string log_file_name;
 };
-
-// Definitions of class ISink methods.
-ISink::ISink( std::shared_ptr<logger::IFormatter> formatter_ptr) : formatter_ptr(formatter_ptr) {}
-
-void logger::ISink::Record(const std::string &msg,
-  const logger::log_level &log_level,
-  const std::string &logger_name,
-  const logger::internal::ExtractedLogCredentials& log_credentials)
-{
-  this->record(msg, log_level, logger_name, log_credentials);
-}
-
-// Definitions of class DefaultSink methods.
-logger::DefaultSink::DefaultSink(std::shared_ptr<logger::IFormatter> formatter,  const std::string &log_file_name)
-  : ISink(formatter), log_file_name(log_file_name)
-{}
-
-void logger::DefaultSink::SetLogFileName(const std::string &log_file_name) { this->log_file_name = log_file_name; }
-
-void logger::DefaultSink::writeToFile(const std::string &formatted_data)
-{
-  std::fstream fout;
-  fout.open(log_file_name, std::ios::app);
-  if (fout.is_open()) {
-    fout << formatted_data << std::endl;
-    fout.close();
-     } else {
-    throw std::exception("File cannot be opened !!");
-  }
-}
-
-void logger::DefaultSink::record(const std::string &msg,
-  const logger::log_level &log_level,
-  const std::string &logger_name,
-  const logger::internal::ExtractedLogCredentials& log_credentials)
-{
-  auto formatted_data = formatter_ptr->FormatData(msg, log_level, logger_name, log_credentials);
-  this->writeToFile(formatted_data);
-}
 };// namespace logger
 #endif()

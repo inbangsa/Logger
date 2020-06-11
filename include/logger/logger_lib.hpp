@@ -19,26 +19,37 @@ public:
    *@retval bool
    */
   Logger(std::shared_ptr<logger::ISink> sink_ptr = std::make_shared<logger::DefaultSink>(),
-    const std::string& logger_name = "runtime_default_logger",
-    logger::log_level log_level = logger::log_level::TRACE);
+    const std::string& logger_name = "default_logger",
+    logger::log_level log_level = logger::log_level::TRACE)
+  {
+    this->sink_ptr = sink_ptr;
+    log_setting.logger_name = logger_name;
+    log_setting.desired_level = log_level;
+  }
 
-  //Copy and Copy Assignment Operator set to default.
+  // Copy and Copy Assignment Operator set to default.
   Logger(const Logger&) = default;
   Logger& operator=(const Logger&) = default;
 
-  //Move and Move Assignment Operator set to default.
-  Logger(Logger&&)=default;
+  // Move and Move Assignment Operator set to default.
+  Logger(Logger&&) = default;
   Logger& operator=(Logger&&) = default;
-    
+
   /*
    *@brief Method to Log the  message at specified level.
    *@param level desired log level
    *@param message log message
    *@retval void
    */
-  void Log(logger::log_level level, const std::string& message);
+  void Log(logger::log_level level, const std::string& message)
+  {
+    if (level <= log_setting.desired_level) {
+      auto log_credentials = logger::internal::ExtractedLogCredentials();
+      sink_ptr->Record(message, level, log_setting.logger_name, log_credentials);
+    }
+  }
 
- /**
+  /**
    * @brief Method to Log the  message at specified level with details such as date time etc.
    * @param level log level at which message is to be logged
    * @param message log message
@@ -46,7 +57,7 @@ public:
    * @param time  time at which message was logged
    * @param file_name  file name where message was logged
    * @param function_name  function name at which message was logged
-   * @param line_number  line number of  the logged message    
+   * @param line_number  line number of  the logged message
    * @retval None
    */
   void Log(logger::log_level level,
@@ -55,78 +66,84 @@ public:
     const std::string& time,
     const std::string& file_name,
     const std::string& function_name,
-    const int& line_number);
-                       
+    const int& line_number)
+  {
+    if (level <= log_setting.desired_level) {
+      auto log_credentials =
+        logger::internal::ExtractedLogCredentials(date, time, file_name, function_name, line_number);
+      sink_ptr->Record(message, level, log_setting.logger_name, log_credentials);
+    }
+  }
+
   /*
    *@brief Method to log message to TRACE level directly.
    *@param message log message
    *@retval void
    */
-  void Trace(const std::string& message);
-  
-   /*
+  void Trace(const std::string& message) { Log(logger::log_level::TRACE, message); }
+
+  /*
    *@brief Method to log message to WARN level directly.
    *@param message log message
    *@retval void
    */
-  void Warn(const std::string& message);
-  
+  void Warn(const std::string& message) { Log(logger::log_level::WARN, message); }
+
   /*
    *@brief Method to log message to ERROR level directly.
    *@param message log message
    *@retval void
    */
-  void Error(const std::string& message);
+  void Error(const std::string& message) { Log(logger::log_level::ERROR, message); }
 
   /*
    *@brief Method to log message to Debug level directly.
    *@param message log message
    *@retval  void
    */
-  void Debug(const std::string& message);
+  void Debug(const std::string& message) { Log(logger::log_level::DEBUG, message); }
 
   /*
    *@brief Method to log message to FATAL level directly.
    *@param message log message
    *@retval  void
    */
-  void Fatal(const std::string& message);
+  void Fatal(const std::string& message) { Log(logger::log_level::FATAL, message); }
 
   /*
    *@brief Method to log message to OFF level directly.
    *@param message log message
    *@retval  void
    */
-  void Off(const std::string& message);
+  void Off(const std::string& message) { Log(logger::log_level::OFF, message); }
 
   /*
    *@brief Method to set the desired log level.
    *@param level desired log level
    *@retval  void
    */
-  void SetLogLevel(logger::log_level level);
+  void SetLogLevel(logger::log_level level) { log_setting.desired_level = level; }
 
   /*
    *@brief Method set logger name.
    *@param logger_name logger name
    *@retval void
    */
-  void SetLoggerName(const std::string& logger_name);
+  void SetLoggerName(const std::string& logger_name) { log_setting.logger_name = logger_name; }
 
   /*
    *@brief Method to set the user defined sink;
    *@param any_sink_ptr user defined sink
    *@retval None
    */
-  void SetSink(std::shared_ptr<logger::ISink> any_sink_ptr);
+  void SetSink(std::shared_ptr<logger::ISink> any_sink_ptr) { sink_ptr = any_sink_ptr; }
 
 private:
-
   /*
    *@brief Object to store logger name and desired log level.
    */
   logger::internal::LogSettings log_setting;
-  
+
   /*
    *@brief A Pointer to the class sink interface for accessing recording data.
    */
@@ -137,17 +154,17 @@ private:
  *@brief Namespace for internal  operations.
  */
 namespace internal {
-  Logger internal_obj;
+  static Logger internal_obj;
 };
 
-//Macro based logging feature.
+// Macro based logging feature.
 /*
  *@brief Macro-Log logs the data at the specified level.
  *@param level log level
  *@param message logging message
  */
 #define LOG(level, message) internal::internal_obj.Log(level, message, __DATE__, __TIME__, __FILE__, __FUNCTION__, __LINE__)
-
+ 
 /*
  *@brief Macro-TRACE logs the data at the trace level.
  *@param message logging message
@@ -170,7 +187,7 @@ namespace internal {
  *@brief Macro-ERROR logs the data at the error level.
  *@param message logging message
  */
-#define ERROR(message) internal::logger::Log(logger::log_level::ERROR, message, __DATE__, __TIME__, __FILE__, __FUNCTION__, __LINE__)
+#define ERROR(message) internal::internal_obj.Log(logger::log_level::ERROR, message, __DATE__, __TIME__, __FILE__, __FUNCTION__, __LINE__)
 
 /*
  *@brief Macro-FATAL logs the data at the fatal level.
@@ -183,8 +200,8 @@ namespace internal {
  *@param message logging message
  */
 #define OFF(message) internal::internal_obj.Log(logger::log_level::OFF, message, __DATE__, __TIME__, __FILE__, __FUNCTION__, __LINE__)
-  
- /*
+
+/*
  *@brief Sets the user defined sink.
  *@param sink_ptr pointer to user defined sink
  */
@@ -196,53 +213,10 @@ namespace internal {
  */
 #define SET_LOG_LEVEL(level) internal::internal_obj.SetLogLevel(level)
 
- /*
+/*
  *@brief Sets the logger name.
  *@param logger_name logger name
  */
 #define SET_LOGGER_NAME(logger_name) internal::internal_obj.SetLoggerName(logger_name)
-
-// Defintions for the class Logger.
-logger::Logger::Logger(std::shared_ptr<logger::ISink> sink_ptr, const std::string& logger_name, logger::log_level log_level)
-{
-  this->sink_ptr = sink_ptr;
-  log_setting.logger_name = logger_name;
-  log_setting.desired_level = log_level;
-}
-
-void logger::Logger::Log(logger::log_level level, const std::string& message)
-{
-  if (level <= log_setting.desired_level) {
-    auto log_credentials = logger::internal::ExtractedLogCredentials();
-    sink_ptr->Record(message, level, log_setting.logger_name, log_credentials);  
-  }
-}
-
- void logger::Logger::Log(logger::log_level level,const std::string& message,const std::string& date,const std::string& time,const std::string& file_name,const std::string& function_name,const int& line_number)
-{
-  if (level <= log_setting.desired_level) 
-  {
-    auto log_credentials=logger::internal::ExtractedLogCredentials(date, time, file_name, function_name, line_number);
-    sink_ptr->Record(message, level, log_setting.logger_name, log_credentials);
-  }
-}
-
-void logger::Logger::Trace(const std::string& message) { Log(logger::log_level::TRACE, message); }
-
-void logger::Logger::Warn(const std::string& message) { Log(logger::log_level::WARN, message); }
-
-void logger::Logger::Error(const std::string& message) { Log(logger::log_level::ERROR, message); }
-
-void logger::Logger::Debug(const std::string& message) { Log(logger::log_level::DEBUG, message); }
-
-void logger::Logger::Fatal(const std::string& message) { Log(logger::log_level::FATAL, message); }
-
-void logger::Logger::Off(const std::string& message) { Log(logger::log_level::OFF, message); }
-
-void logger::Logger::SetLogLevel(logger::log_level level) { log_setting.desired_level = level; }
-
-void Logger::SetLoggerName(const std::string& logger_name) { log_setting.logger_name = logger_name; }
-
-void logger::Logger::SetSink(std::shared_ptr<logger::ISink> any_sink_ptr) { sink_ptr = any_sink_ptr; }
 };// namespace logger
 #endif()
