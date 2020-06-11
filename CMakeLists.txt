@@ -12,7 +12,13 @@ add_library(logger_lib_target INTERFACE)
 
 target_include_directories(logger_lib_target INTERFACE 
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-	$<INSTALL_INTERFACE:include/>)
+	$<INSTALL_INTERFACE:include>)
+
+option(BUILD_EXAMPLE "Turn on to build example." ON)
+
+if(BUILD_EXAMPLE)
+add_subdirectory(sample)
+endif()
 
 #Install the required files and folder.
 install(DIRECTORY include DESTINATION ${CMAKE_INSTALL_PREFIX})
