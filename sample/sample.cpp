@@ -31,8 +31,9 @@ bool SampleDivideFunction(int number_1, int number_2)
 { 
   if (number_2 == 0) {
     throw std::exception("Divisor cannot be zero.");
-     } else
+  } else {
     return number_1 / number_2;
+  }
 }
 
 int main()
