@@ -1,2 +1,2 @@
 add_executable(sample sample.cpp)
-target_link_libraries(sample logger_lib_target)
+target_link_libraries(sample logger_lib)
