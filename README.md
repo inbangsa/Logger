@@ -140,12 +140,9 @@ private:
     //User defined definition to format the data.   
  }
 };
-```cpp
-
 
 // User defined sink can be File, database, anyserver etc which can implemented easily by deriving class from the abstract class ISink as shown below:-
 
-```cpp
 class UserdefinedSink: public ISink
 {
 void record(const std::string& msg,
